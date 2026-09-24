@@ -8,7 +8,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import okhttp3.Headers;
 
 @Service
 public class WikimediaChangesProducer {
@@ -21,14 +23,19 @@ public class WikimediaChangesProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendMessage(String message) throws InterruptedException {
+    public void sendMessage() throws InterruptedException {
 
         String topic= "wikimedia_recentchange";
 
         // to read real time stream data from wikimedia, we use event sourse
         EventHandler eventHandler = new WikimediaChangesHandler(kafkaTemplate, topic);
         String url = "https://stream.wikimedia.org/v2/stream/recentchange";
-        EventSource.Builder builder = new EventSource.Builder(eventHandler, URI.create(url));
+        Headers headers = new Headers.Builder()
+                .add("User-Agent", "springboot-kafka-tutorial/1.0 (learning project; local development)")
+                .build();
+
+        EventSource.Builder builder = new EventSource.Builder(eventHandler, URI.create(url))
+                .headers(headers);
         EventSource eventSource = builder.build();
         eventSource.start();
 
