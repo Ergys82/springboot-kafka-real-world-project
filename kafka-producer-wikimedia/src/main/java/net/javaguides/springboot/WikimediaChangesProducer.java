@@ -20,6 +20,7 @@ public class WikimediaChangesProducer {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     public WikimediaChangesProducer(KafkaTemplate<String, String> kafkaTemplate) {
+
         this.kafkaTemplate = kafkaTemplate;
     }
 
